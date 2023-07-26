@@ -43,6 +43,10 @@ func New(host, port string) *HttpServer {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = db.Conn().Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
 	mux := http.NewServeMux()
 
 	return &HttpServer{
@@ -63,7 +67,8 @@ func New(host, port string) *HttpServer {
 // добавление маршрутов
 func (hs *HttpServer) InitRoutes() {
 	mx := hs.Handler.(*http.ServeMux)
-	mx.HandleFunc("/", Home)
+	mx.HandleFunc("/", hs.Home)
+	mx.HandleFunc("/add-user", hs.AddUser)
 }
 
 func (hs *HttpServer) Serve() error {

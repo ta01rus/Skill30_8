@@ -5,6 +5,10 @@ type Users struct {
 	Name string
 }
 
+func (u *Users) Valid() bool {
+	return u.Name != ""
+}
+
 type Task struct {
 	ID         uint
 	Opened     uint

@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  db:
+    build: .
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234567
+      POSTGRES_USER: foo
+      POSTGRES_DB: skill_db
+    ports:
+      - "5444:5432"
