@@ -58,7 +58,6 @@ func (hs *HttpServer) AddUser(w http.ResponseWriter, r *http.Request) {
 			user.Name = r.PostFormValue("user")
 		}
 		if user.Valid() {
-			// опр. ураавня транз.
 			tx, err := connDB.Begin()
 			if err != nil {
 				log.Println(err)
@@ -81,8 +80,7 @@ func (hs *HttpServer) AddUser(w http.ResponseWriter, r *http.Request) {
 			tx.Commit()
 
 			htmlStr := fmt.Sprintf(`
-			<tr>
-			<th scope="row"></th>
+			<tr>			
 			<td>%d</td>
 			<td>%s</td>                              
 		  	</tr>`, user.ID, user.Name)
@@ -94,23 +92,20 @@ func (hs *HttpServer) AddUser(w http.ResponseWriter, r *http.Request) {
 			tmpl.Execute(w, tmpl)
 		}
 	}
+}
 
-	// rows, err := connDB.QueryContext(ctx, `
-	// 	select id , name  from users
-	// `)
-	// if err != nil {
-	// 	log.Println(err)
-	// }
+func (hs *HttpServer) DelUser(w http.ResponseWriter, r *http.Request) {
+	var (
+	// user   = storage.Users{}
+	// connDB = hs.db.Conn()
+	)
+	// ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
+	// defer cancel()
 
-	// for rows.Next() {
-	// 	user := storage.Users{}
-	// 	err := rows.Scan(&user.ID, &user.Name)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
+	h := r.Header.Get("HX-Request")
+	log.Println(h)
+	if h == "true" {
+		fmt.Println(r.URL.Fragment)
 
-	// 	args.Users = append(args.Users, user)
-	// }
-	// tmpl := template.Must(template.ParseFiles("./template/index.html"))
-	// tmpl.Execute(w, args)
+	}
 }

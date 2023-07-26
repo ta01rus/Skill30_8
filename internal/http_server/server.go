@@ -69,6 +69,8 @@ func (hs *HttpServer) InitRoutes() {
 	mx := hs.Handler.(*http.ServeMux)
 	mx.HandleFunc("/", hs.Home)
 	mx.HandleFunc("/add-user", hs.AddUser)
+	mx.HandleFunc("/del-user/:id", hs.AddUser)
+
 }
 
 func (hs *HttpServer) Serve() error {
