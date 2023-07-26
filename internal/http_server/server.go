@@ -7,7 +7,7 @@ import (
 
 	"time"
 
-	"github.com/ta01rus/Skill30_8/internal/database"
+	"github.com/ta01rus/Skill30_8/internal/storage"
 )
 
 const (
@@ -21,12 +21,12 @@ type HttpServer struct {
 	http.Server
 	host string
 	port string
-	db   database.DB
+	db   storage.DB
 }
 
 func New(host, port string) *HttpServer {
 	connWs := net.JoinHostPort(host, port)
-	db, err := database.NewEnv()
+	db, err := storage.NewEnv()
 	if err != nil {
 		log.Fatal(err)
 	}

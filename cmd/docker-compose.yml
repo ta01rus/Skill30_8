@@ -8,6 +8,6 @@ services:
     environment:
       POSTGRES_PASSWORD: 1234567
       POSTGRES_USER: foo
-      POSTGRES_DB: item_db
+      POSTGRES_DB: skill_db
     ports:
       - "5444:5432"
