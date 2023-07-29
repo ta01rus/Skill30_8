@@ -43,7 +43,7 @@
                                 </tr>
                             </thead>                            
                             <tbody id="usersList" hx-target="closest tr" hx-swap="delete">
-                                {{range $u := .Users}}
+                                {{range $t := .Tasks}}
                                 <tr>                                                              
                                     <td>{{$u.ID}}</td>
                                     <td>{{$u.Name}}</td>                              

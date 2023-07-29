@@ -5,14 +5,14 @@ import "context"
 type DB interface {
 
 	// получение заданий
-	Tasks(context.Context, int, int, int) ([]*Tasks, error)
+	Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*Tasks, error)
 
 	AddTasks(context.Context, *Tasks) (*Tasks, error)
 
 	DelTasks(context.Context, int) error
 
 	// пользователи
-	Users(context.Context, int) ([]*Users, error)
+	Users(ctx context.Context, id int, offset, limit int) ([]*Users, error)
 
 	// добаавить пользователя
 	AddUsers(context.Context, *Users) (*Users, error)

@@ -11,16 +11,18 @@ import (
 	"github.com/ta01rus/Skill30_8/pkg/storage"
 )
 
-func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int) ([]*storage.Tasks, error) {
+func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*storage.Tasks, error) {
 	ret := []*storage.Tasks{}
 	sqlt := `
 			select id, title , assigned_id , author_id , "content", opened, closed  
 			from tasks
 			where ($1 = 0 or id = $1) and
-				  (&2 = 0 or assigned_id = $2) and
-				  (&3 = 0 or author_id = $3) and
+				  ($2 = 0 or assigned_id = $2) and
+				  ($3 = 0 or author_id = $3) 
+			order by id
+			offset $4 limit $5
 		 `
-	rows, err := db.QueryContext(ctx, sqlt)
+	rows, err := db.QueryContext(ctx, sqlt, id, asgID, athID, offset, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -46,14 +48,16 @@ func (db *Postgres) AddTasks(ctx context.Context, t *storage.Tasks) (*storage.Ta
 func (db *Postgres) DelTasks(ctx context.Context, id int) error {
 	return nil
 }
-func (db *Postgres) Users(ctx context.Context, id int) ([]*storage.Users, error) {
+func (db *Postgres) Users(ctx context.Context, id, offset, limit int) ([]*storage.Users, error) {
 
 	ret := []*storage.Users{}
 	sqlt := `
 			select id, name	from tasks
 			where ($1 = 0 or id = $1) 
+			order by id
+			offset $2 limit $3
 		 `
-	rows, err := db.QueryContext(ctx, sqlt)
+	rows, err := db.QueryContext(ctx, sqlt, id, offset, limit)
 	if err != nil {
 		return nil, err
 	}

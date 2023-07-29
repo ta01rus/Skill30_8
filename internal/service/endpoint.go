@@ -15,13 +15,35 @@ import (
 // стартовая страница отабражаает поль
 func (hs *HttpServer) HomeEndPoooint(c *gin.Context) {
 	var (
+		err              error
+		page             = 1
+		id, athID, asgID = 0, 0, 0
+		offset, limit    = 0, 5
+
 		args = struct {
 			Error string
 			Tasks []*storage.Tasks
 		}{}
 	)
+
+	id, _ = strconv.Atoi(c.Query("id"))
+	asgID, _ = strconv.Atoi(c.Query("assigned"))
+	athID, _ = strconv.Atoi(c.Query("author"))
+
+	page, _ = strconv.Atoi(c.Query("page"))
+
+	offset = (page * offset) - offset
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
 	defer cancel()
+
+	args.Tasks, err = hs.Db.Tasks(ctx, id, athID, asgID, offset, limit)
+
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "index.html", nil)
+		return
+	}
 
 	c.HTML(200, "index.html", args)
 
