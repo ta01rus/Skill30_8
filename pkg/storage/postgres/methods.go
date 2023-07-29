@@ -64,8 +64,7 @@ func (db *Postgres) AddTasks(ctx context.Context, t *storage.TaskView) (*storage
 		return nil, err
 	}
 
-	sqlt := `INSERT INTO tasks (TITLE, AUTHOR_ID, ASSIGNED_ID, CONTENT) VALUES ($1, $2, $3, $4) 
-		ON CONFLICT (name) DO NOTHING
+	sqlt := `INSERT INTO tasks (TITLE, AUTHOR_ID, ASSIGNED_ID, CONTENT, opened, closed) VALUES ($1, $2, $3, $4, 0, 0) 		
 		RETURNING id`
 
 	stmt, err := tx.Prepare(sqlt)
@@ -131,7 +130,9 @@ func (db *Postgres) AddUsers(ctx context.Context, u *storage.Users) (*storage.Us
 		return nil, err
 	}
 	sqlt := `INSERT INTO users (name) VALUES ($1) 
-				ON CONFLICT (name) DO NOTHING
+				ON CONFLICT (name) 
+				DO UPDATE SET 
+			    name=EXCLUDED.name 
 				RETURNING id`
 
 	stmt, err := tx.Prepare(sqlt)
