@@ -1,15 +1,15 @@
 package storage
 
 type Users struct {
-	ID   uint
-	Name string
+	ID   uint   `form:"user_id"`
+	Name string `form:"user"`
 }
 
 func (u *Users) Valid() bool {
 	return u.Name != ""
 }
 
-type Task struct {
+type Tasks struct {
 	ID         uint
 	Opened     uint
 	Closed     uint

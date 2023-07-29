@@ -7,8 +7,8 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
-	httpserver "github.com/ta01rus/Skill30_8/internal/http_server"
-	"github.com/ta01rus/Skill30_8/internal/storage"
+	"github.com/ta01rus/Skill30_8/internal/service"
+	"github.com/ta01rus/Skill30_8/pkg/storage/postgres"
 
 	"github.com/urfave/cli"
 )
@@ -118,7 +118,7 @@ func main() {
 }
 
 func Serve() {
-	http := httpserver.NewEnv()
+	http := service.NewEnv()
 	err := http.Serve()
 	if err != nil {
 		log.Fatal(err)
@@ -126,7 +126,7 @@ func Serve() {
 }
 
 func Migrate(cmd string, args ...string) {
-	db, err := storage.NewEnv()
+	db, err := postgres.NewEnv()
 	if err != nil {
 		log.Fatal(err)
 	}

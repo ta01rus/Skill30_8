@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+    </head>
+    <body>
+        <main>
+            <div class="container">
+                <div class="row">                
+                    <div class="col-12 text-center">
+                        <h2>
+                            Пользователи
+                        </h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <nav class="nav flex-column">
+                            <a class="nav-link active" aria-current="page" href="#">Active</a>
+                            <a class="nav-link" href="#">Link</a>
+                            <a class="nav-link" href="#">Link</a>
+                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                        </nav>
+                    </div>
+                    <div class="col-7">                    
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                <th scope="col"></th>
+                                <th scope="col">ID</th>
+                                <th scope="col">Name</th>                              
+                                </tr>
+                            </thead>                            
+                            <tbody id="usersList" hx-target="closest tr" hx-swap="delete">
+                                {{range $u := .Users}}
+                                <tr>                                                              
+                                    <td>{{$u.ID}}</td>
+                                    <td>{{$u.Name}}</td>                              
+                                    <td>
+                                        <button class="btn btn-danger" hx-delete="/del-user/{{$u.ID}}">
+                                            X
+                                        </button>
+                                    </td> 
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-3">
+                        <form hx-post="/add-user" hx-target="#usersList" hx-swap="beforeend">
+                            <div class="mb-3">
+                                <label for="user_name" class="form-label">User name:</label>
+                                <input type="text" id="user_name" name="user" class="form-control">
+                                <div id="userNameHelp" class="form-text">Set user name.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>                    
+                    </div>                
+                </div>
+            </div>
+        </main>
+        <footer>
+            
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    
+    </body>
+
+</html>
+
+
+
+
+
