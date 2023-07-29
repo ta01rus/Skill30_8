@@ -22,7 +22,7 @@ func (hs *HttpServer) HomeEndPoooint(c *gin.Context) {
 
 		args = struct {
 			Error string
-			Tasks []*storage.Tasks
+			Tasks []*storage.TaskView
 		}{}
 	)
 

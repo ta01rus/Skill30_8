@@ -11,11 +11,11 @@ import (
 	"github.com/ta01rus/Skill30_8/pkg/storage"
 )
 
-func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*storage.Tasks, error) {
-	ret := []*storage.Tasks{}
+func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*storage.TaskView, error) {
+	ret := []*storage.TaskView{}
 	sqlt := `
-			select id, title , assigned_id , author_id , "content", opened, closed  
-			from tasks
+			select id, title , author_name, assigned_name, "content", opened, closed 
+			from task__view
 			where ($1 = 0 or id = $1) and
 				  ($2 = 0 or assigned_id = $2) and
 				  ($3 = 0 or author_id = $3) 
@@ -28,10 +28,10 @@ func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, lim
 	}
 
 	for rows.Next() {
-		task := new(storage.Tasks)
+		task := new(storage.TaskView)
 
-		err := rows.Scan(task.ID, task.Title, task.AssignedID,
-			task.AuthorID, task.Content, task.Opened, task.Closed)
+		err := rows.Scan(task.ID, task.Title, task.AuthorName,
+			task.AssignedName, task.Content, task.Opened, task.Closed)
 		if err != nil {
 			return nil, err
 		}

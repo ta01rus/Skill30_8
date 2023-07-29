@@ -29,3 +29,13 @@ type TaskLabels struct {
 	LabelID uint
 	TaskID  uint
 }
+
+type TaskView struct {
+	ID           uint
+	Opened       uint
+	Closed       uint
+	AuthorName   string
+	AssignedName string
+	Title        string
+	Content      string
+}

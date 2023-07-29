@@ -52,12 +52,16 @@ func New(host, port string) *HttpServer {
 // добавление маршрутов
 func (hs *HttpServer) InitRoutes() {
 	html := template.Must(template.ParseFiles("./templates/index.html"))
+
 	hs.Routes.SetHTMLTemplate(html)
 
 	hs.Routes.GET("/", hs.HomeEndPoooint)
+
 	hs.Routes.POST("/add-user", hs.AddUserEndPoint)
 	hs.Routes.DELETE("/del-user/:id", hs.DelUserEndPoint)
+	hs.Routes.StaticFS("/static", http.Dir("./web"))
 
+	hs.Routes.StaticFile("/favicon.ico", "./web/favicon.svg")
 }
 
 func (hs *HttpServer) Serve() error {
@@ -77,8 +81,6 @@ func (hs *HttpServer) Serve() error {
 		MaxHeaderBytes: 1 << 20,
 		Handler:        hs.Routes,
 	}
-
-	log.Printf("http serve %s:%s", hs.host, hs.port)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {

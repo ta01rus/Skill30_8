@@ -5,7 +5,7 @@ import "context"
 type DB interface {
 
 	// получение заданий
-	Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*Tasks, error)
+	Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*TaskView, error)
 
 	AddTasks(context.Context, *Tasks) (*Tasks, error)
 
