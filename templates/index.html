@@ -63,11 +63,18 @@
                               <h3> Добавть задание</h3>
                         </div>                            
                         <div class="row">
-                        <form hx-post="/add-task" hx-target="#task-list" hx-swap="beforeend">
+                        <form hx-post="/save-task" hx-target="#task-list" hx-swap="beforeend">
+                            <div class="form-group">
+                                <div class="mb-3">
+                                    <label for="task-id" class="form-label">ID:</label>
+                                    <input  type="text" id="task-id" name="id" class="form-control" disabled >
+                                    <div id="task-title" class="form-text">id.</div>
+                                </div>  
+                            </div>
                             <div class="form-group">
                                 <div class="mb-3">
                                     <label for="task-title" class="form-label">Title:</label>
-                                    <input type="text" id="tsk-title" name="title" class="form-control">
+                                    <input type="text" id="task-title" name="title" class="form-control">
                                     <div id="task-title" class="form-text">set title task.</div>
                                 </div>  
                             </div>

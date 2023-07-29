@@ -49,9 +49,9 @@ func (hs *HttpServer) HomeEndPoint(c *gin.Context) {
 
 }
 
-func (hs *HttpServer) AddTaskEndPoint(c *gin.Context) {
+func (hs *HttpServer) SaveTaskEndPoint(c *gin.Context) {
 	var (
-		task = storage.TaskView{}
+		task = new(storage.TaskView)
 	)
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
@@ -59,7 +59,7 @@ func (hs *HttpServer) AddTaskEndPoint(c *gin.Context) {
 	h := c.Request.Header.Get("HX-Request")
 	log.Println(h)
 	if h == "true" {
-		err := c.Bind(&task)
+		err := c.Bind(task)
 		if err != nil {
 			log.Println(err)
 			c.HTML(403, "index.html", nil)
@@ -71,8 +71,12 @@ func (hs *HttpServer) AddTaskEndPoint(c *gin.Context) {
 			c.HTML(403, "index.html", nil)
 			return
 		}
+		if task.ID == 0 {
+			task, err = hs.Db.AddTasks(ctx, task)
+		} else {
+			task, err = hs.Db.AddTasks(ctx, task)
+		}
 
-		task, err := hs.Db.AddTasks(ctx, &task)
 		if err != nil {
 			log.Println(err)
 			c.HTML(403, "index.html", nil)
