@@ -23,33 +23,31 @@
                 <div class="row">                
                     <div class="col-12 text-center">
                         <h2>
-                            Пользователи
+                            Задачи пользователей
                         </h2>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-2">
-                        <nav class="nav flex-column">
-                            <a class="nav-link active" aria-current="page" href="#">Active</a>
-                            <a class="nav-link" href="#">Link</a>
-                            <a class="nav-link" href="#">Link</a>
-                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                        </nav>
-                    </div>
-                    <div class="col-7">                    
+                <div class="row">                    
+                    <div class="col-8">                    
                         <table class="table table-dark table-hover">
                             <thead>
-                                <tr>
-                                <th scope="col"></th>
-                                <th scope="col">ID</th>
-                                <th scope="col">Name</th>                              
+                                <tr>                                
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Author</th>
+                                    <th scope="col">Assigned</th>
+                                    <th scope="col">Content</th>
+                                    <th scope="col">DEL</th>
                                 </tr>
                             </thead>                            
-                            <tbody id="usersList" hx-target="closest tr" hx-swap="delete">
+                            <tbody id="task-list" hx-target="closest tr" hx-swap="delete">
                                 {{range $t := .Tasks}}
                                 <tr>                                                              
                                     <td>{{$t.ID}}</td>
-                                    <td>{{$t.Title}}</td>                              
+                                    <td>{{$t.Title}}</td>      
+                                    <td>{{$t.AuthorName}}</td>      
+                                    <td>{{$t.AssignedName}}</td>      
+                                    <td>{{$t.Content}}</td>                                                                 
                                     <td>
                                         <button class="btn btn-danger" hx-delete="/del-task/{{$t.ID}}">
                                             X
@@ -60,15 +58,44 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-3">
-                        <form hx-post="/add-user" hx-target="#usersList" hx-swap="beforeend">
-                            <div class="mb-3">
-                                <label for="user_name" class="form-label">User name:</label>
-                                <input type="text" id="user_name" name="user" class="form-control">
-                                <div id="userNameHelp" class="form-text">Set user name.</div>
+                    <div class="col-4">
+                        <div class="row">
+                              <h3> Добавть задание</h3>
+                        </div>                            
+                        <div class="row">
+                        <form hx-post="/add-task" hx-target="#task-list" hx-swap="beforeend">
+                            <div class="form-group">
+                                <div class="mb-3">
+                                    <label for="task-title" class="form-label">Title:</label>
+                                    <input type="text" id="tsk-title" name="title" class="form-control">
+                                    <div id="task-title" class="form-text">set title task.</div>
+                                </div>  
                             </div>
+                            <div class="form-group">
+                                <div class="mb-3">
+                                    <label for="task-author" class="form-label">Author:</label>
+                                    <input type="text" id="task-author" name="author" class="form-control">
+                                    <div id="task-author" class="form-text">Set task author.</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="mb-3">
+                                    <label for="task-assigned" class="form-label">Assigned:</label>
+                                    <input type="text" id="task-assigned" name="assigned" class="form-control">
+                                    <div id="task-assigned" class="form-text">Set task assigned.</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="task-content">Content</label>
+                                <textarea class="form-control" id="task-content" name="content" rows="3"></textarea>
+                                <div id="task-content" class="form-text">Set task assigned.</div>
+                              </div>
+                            </div>                              
+
                             <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>                    
+                        </form>          
+                            </div>                     
+                        
                     </div>                
                 </div>
             </div>

@@ -55,12 +55,11 @@ func (hs *HttpServer) InitRoutes() {
 
 	hs.Routes.SetHTMLTemplate(html)
 
-	hs.Routes.GET("/", hs.HomeEndPoooint)
+	hs.Routes.GET("/", hs.HomeEndPoint)
 
-	hs.Routes.POST("/add-user", hs.AddUserEndPoint)
-	hs.Routes.DELETE("/del-user/:id", hs.DelUserEndPoint)
+	hs.Routes.POST("/add-task", hs.AddTaskEndPoint)
+	hs.Routes.DELETE("/del-task/:id", hs.DelTaskEndPoint)
 	hs.Routes.StaticFS("/static", http.Dir("./web"))
-
 	hs.Routes.StaticFile("/favicon.ico", "./web/favicon.svg")
 }
 

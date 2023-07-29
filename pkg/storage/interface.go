@@ -7,7 +7,7 @@ type DB interface {
 	// получение заданий
 	Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*TaskView, error)
 
-	AddTasks(context.Context, *Tasks) (*Tasks, error)
+	AddTasks(context.Context, *TaskView) (*TaskView, error)
 
 	DelTasks(context.Context, int) error
 

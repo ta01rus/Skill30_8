@@ -15,7 +15,7 @@ func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, lim
 	ret := []*storage.TaskView{}
 	sqlt := `
 			select id, title , author_name, assigned_name, "content", opened, closed 
-			from task__view
+			from task_view
 			where ($1 = 0 or id = $1) and
 				  ($2 = 0 or assigned_id = $2) and
 				  ($3 = 0 or author_id = $3) 
@@ -41,8 +41,52 @@ func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, lim
 	return ret, nil
 }
 
-func (db *Postgres) AddTasks(ctx context.Context, t *storage.Tasks) (*storage.Tasks, error) {
-	return nil, nil
+func (db *Postgres) AddTasks(ctx context.Context, t *storage.TaskView) (*storage.TaskView, error) {
+
+	err := t.Check()
+	if err != nil {
+		err := fmt.Errorf("user is not valid")
+		return nil, err
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	author, err := db.AddUsers(ctx, &storage.Users{Name: t.AuthorName})
+	if err != nil {
+		return nil, err
+	}
+
+	assigned, err := db.AddUsers(ctx, &storage.Users{Name: t.AssignedName})
+	if err != nil {
+		return nil, err
+	}
+
+	sqlt := `INSERT INTO tasks (TITLE, AUTHOR_ID, ASSIGNED_ID, CONTENT) VALUES ($1, $2, $3, $4) 
+		ON CONFLICT (name) DO NOTHING
+		RETURNING id`
+
+	stmt, err := tx.Prepare(sqlt)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRowContext(ctx, t.Title, author.ID, assigned.ID, t.Content).Scan(&t.ID)
+
+	if err != nil {
+		return nil, err
+	}
+	tx.Commit()
+
+	t.AssignedName = assigned.Name
+	t.AssignedID = assigned.ID
+	t.AuthorID = author.ID
+	t.AuthorName = t.AuthorName
+	return t, nil
 }
 
 func (db *Postgres) DelTasks(ctx context.Context, id int) error {
@@ -86,7 +130,10 @@ func (db *Postgres) AddUsers(ctx context.Context, u *storage.Users) (*storage.Us
 	if err != nil {
 		return nil, err
 	}
-	sqlt := ` INSERT INTO users (name) VALUES ($1) RETURNING id	`
+	sqlt := `INSERT INTO users (name) VALUES ($1) 
+				ON CONFLICT (name) DO NOTHING
+				RETURNING id`
+
 	stmt, err := tx.Prepare(sqlt)
 	if err != nil {
 		tx.Rollback()
