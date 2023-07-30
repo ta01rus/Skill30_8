@@ -12,13 +12,13 @@ import (
 func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*storage.Tasks, error) {
 	ret := []*storage.Tasks{}
 	sqlt := `
-			select id, title , author_id, assigned_id, "content", opened, closed 
-			from tasks
-			where ($1 = 0 or id = $1) and
-				  ($2 = 0 or assigned_id = $2) and
-				  ($3 = 0 or author_id = $3) 
-			order by id
-			offset $4 limit $5
+			SELECT ID, TITLE, AUTHOR_ID, ASSIGNED_ID, "CONTENT", OPENED, CLOSED 
+			FROM TASKS
+			WHERE ($1 = 0 OR ID = $1) AND
+				  ($2 = 0 OR ASSIGNED_ID = $2) AND
+				  ($3 = 0 OR AUTHOR_ID = $3) 
+			ORDER BY ID
+			OFFSET $4 LIMIT $5
 		 `
 	rows, err := db.QueryContext(ctx, sqlt, id, asgID, athID, offset, limit)
 	if err != nil {
@@ -46,9 +46,9 @@ func (db *Postgres) InsTasks(ctx context.Context, t *storage.Tasks) (*storage.Ta
 		return nil, err
 	}
 
-	sqlt := `INSERT INTO tasks (TITLE, AUTHOR_ID, ASSIGNED_ID, CONTENT, opened, closed) 
+	sqlt := `INSERT INTO tasks (TITLE, AUTHOR_ID, ASSIGNED_ID, CONTENT, OPENED, CLOSED) 
 			 VALUES ($1, $2, $3, $4, 0, 0) 	
-			 RETURNING id`
+			 RETURNING ID`
 
 	stmt, err := tx.Prepare(sqlt)
 	if err != nil {
