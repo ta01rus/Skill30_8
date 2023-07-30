@@ -42,6 +42,23 @@ type Postgres struct {
 	config *DbConfig
 }
 
+func New(c *DbConfig) (storage.DB, error) {
+	db, err := sql.Open("pgx", c.UrlPostgres())
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Postgres{
+		DB:     db,
+		config: c,
+	}, nil
+}
+
 func NewEnv() (storage.DB, error) {
 
 	c := NewConfigFromEnv()

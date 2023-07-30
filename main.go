@@ -7,7 +7,6 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
-	"github.com/ta01rus/Skill30_8/internal/service"
 	"github.com/ta01rus/Skill30_8/pkg/storage/postgres"
 
 	"github.com/urfave/cli"
@@ -27,14 +26,6 @@ func main() {
 		Name:  "pgx generator db",
 		Usage: "PGX",
 		Commands: []cli.Command{
-			{
-				Name:  "serve",
-				Usage: "",
-				Action: func(*cli.Context) error {
-					Serve()
-					return nil
-				},
-			},
 			{
 				Name:  "down",
 				Usage: "",
@@ -115,14 +106,6 @@ func main() {
 		},
 	}
 	app.Run(os.Args)
-}
-
-func Serve() {
-	http := service.NewEnv()
-	err := http.Serve()
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func Migrate(cmd string, args ...string) {
