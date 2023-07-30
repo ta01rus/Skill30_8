@@ -8,7 +8,9 @@ type DB interface {
 	InsTasks(context.Context, *Tasks) (*Tasks, error)
 
 	UpdTasks(context.Context, *Tasks) (*Tasks, error)
+
 	DelTasks(context.Context, int) error
+
 	// контроль миграций
 	MigrateDB(string, ...string) error
 }
