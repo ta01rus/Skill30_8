@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"html/template"
 	"log"
 	"net"
 	"net/http"
@@ -16,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ta01rus/Skill30_8/pkg/storage"
 	"github.com/ta01rus/Skill30_8/pkg/storage/postgres"
+	"github.com/ta01rus/Skill30_8/pkg/tmphtml"
 )
 
 var wait time.Duration
@@ -23,6 +23,8 @@ var wait time.Duration
 type HttpServer struct {
 	// моршруты
 	Routes *gin.Engine
+
+	Temps map[string]*tmphtml.FileHtmlTemplate
 
 	Db storage.DB
 
@@ -46,19 +48,23 @@ func New(host, port string) *HttpServer {
 		Db:     db,
 		host:   host,
 		port:   port,
+		Temps:  make(map[string]*tmphtml.FileHtmlTemplate),
 	}
 }
 
 // добавление маршрутов
 func (hs *HttpServer) InitRoutes() {
-	html := template.Must(template.ParseFiles("./templates/index.html"))
+	//load html file
 
-	hs.Routes.SetHTMLTemplate(html)
+	hs.Routes.LoadHTMLFiles("templates/app.html")
 
 	hs.Routes.GET("/", hs.HomeEndPoint)
+	hs.Routes.Match([]string{http.MethodGet, http.MethodPost}, "/task/add", hs.AddTaskEndPoint)
 
-	hs.Routes.POST("/save-task", hs.SaveTaskEndPoint)
-	hs.Routes.DELETE("/del-task/:id", hs.DelTaskEndPoint)
+	hs.Routes.POST("/task/:id", hs.TaskEndPoint)
+	hs.Routes.POST("/task/:id/edit", hs.EditTaskEndPoint)
+	hs.Routes.DELETE("/task/:id/del", hs.DelTaskEndPoint)
+
 	hs.Routes.StaticFS("/static", http.Dir("./web"))
 	hs.Routes.StaticFile("/favicon.ico", "./web/favicon.svg")
 }

@@ -26,6 +26,9 @@ func (hs *HttpServer) HomeEndPoint(c *gin.Context) {
 		}{}
 	)
 
+	html := template.Must(template.ParseFiles("./templates/index.html", "./templates/home.html"))
+	hs.Routes.SetHTMLTemplate(html)
+
 	id, _ = strconv.Atoi(c.Query("id"))
 	asgID, _ = strconv.Atoi(c.Query("assigned"))
 	athID, _ = strconv.Atoi(c.Query("author"))
@@ -45,11 +48,113 @@ func (hs *HttpServer) HomeEndPoint(c *gin.Context) {
 		return
 	}
 
-	c.HTML(200, "index.html", args)
+	c.HTML(200, "home.html", args)
 
 }
 
-func (hs *HttpServer) SaveTaskEndPoint(c *gin.Context) {
+func (hs *HttpServer) TaskEndPoint(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "index.html", nil)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
+	defer cancel()
+
+	task, err := hs.Db.Task(ctx, id)
+
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "index.html", nil)
+		return
+	}
+	c.HTML(200, "index.html", task)
+}
+
+func (hs *HttpServer) AddTaskEndPoint(c *gin.Context) {
+	var (
+		task = new(storage.TaskView)
+	)
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	h := c.Request.Header.Get("HX-Request")
+
+	if h != "true" {
+		c.HTML(200, "add.html", nil)
+		return
+	}
+
+	err := c.Bind(task)
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "index.html", nil)
+		return
+	}
+	err = task.Check()
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "index.html", nil)
+		return
+	}
+	if task.ID == 0 {
+		task, err = hs.Db.AddTasks(ctx, task)
+	} else {
+		task, err = hs.Db.AddTasks(ctx, task)
+	}
+
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "index.html", nil)
+		return
+	}
+
+	htmlStr := fmt.Sprintf(`
+		<tr>						
+		<td>%d</td>
+		<td>%s</td>    
+		<td>%s</td>    
+		<td>%s</td>    
+		<td>%s</td>    
+		<td>
+			<button class="btn btn-danger" hx-delete="/task/{{.ID}}/del">
+			X
+			</button>
+		</td>                           
+		</tr>`, task.ID, task.Title, task.AuthorName, task.AssignedName, task.Content)
+
+	tmpl, err := template.New("tr").Parse(htmlStr)
+	if err != nil {
+		log.Panicln(err)
+	}
+	tmpl.Execute(c.Writer, task)
+
+}
+
+func (hs *HttpServer) DelTaskEndPoint(c *gin.Context) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	taskId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "home.html", nil)
+		return
+	}
+	err = hs.Db.DelTasks(ctx, taskId)
+	if err != nil {
+		log.Println(err)
+		c.HTML(403, "home.html", nil)
+		return
+	}
+	c.JSON(200, nil)
+}
+
+func (hs *HttpServer) EditTaskEndPoint(c *gin.Context) {
 	var (
 		task = new(storage.TaskView)
 	)
@@ -103,24 +208,4 @@ func (hs *HttpServer) SaveTaskEndPoint(c *gin.Context) {
 		}
 		tmpl.Execute(c.Writer, task)
 	}
-}
-
-func (hs *HttpServer) DelTaskEndPoint(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	taskId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		log.Println(err)
-		c.HTML(403, "index.html", nil)
-		return
-	}
-	err = hs.Db.DelTasks(ctx, taskId)
-	if err != nil {
-		log.Println(err)
-		c.HTML(403, "index.html", nil)
-		return
-	}
-
-	c.HTML(200, "index.html", nil)
 }

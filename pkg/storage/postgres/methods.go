@@ -11,6 +11,23 @@ import (
 	"github.com/ta01rus/Skill30_8/pkg/storage"
 )
 
+func (db *Postgres) Task(ctx context.Context, id int) (*storage.TaskView, error) {
+	task := storage.TaskView{}
+	sqlt := `
+			select id, title , author_name, assigned_name, "content", opened, closed 
+			from task_view
+			where id = $1
+		 `
+	row := db.QueryRowContext(ctx, sqlt, id)
+	err := row.Scan(&task.ID, &task.Title, &task.AuthorName,
+		&task.AssignedName, &task.Content, &task.Opened, &task.Closed)
+
+	if err != nil {
+		return nil, err
+	}
+	return &task, err
+}
+
 func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*storage.TaskView, error) {
 	ret := []*storage.TaskView{}
 	sqlt := `
@@ -30,8 +47,8 @@ func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, lim
 	for rows.Next() {
 		task := new(storage.TaskView)
 
-		err := rows.Scan(task.ID, task.Title, task.AuthorName,
-			task.AssignedName, task.Content, task.Opened, task.Closed)
+		err := rows.Scan(&task.ID, &task.Title, &task.AuthorName,
+			&task.AssignedName, &task.Content, &task.Opened, &task.Closed)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +106,26 @@ func (db *Postgres) AddTasks(ctx context.Context, t *storage.TaskView) (*storage
 }
 
 func (db *Postgres) DelTasks(ctx context.Context, id int) error {
+	tx, err := db.Begin()
+	if err != nil {
+		log.Println(err)
+	}
+	stmt, err := tx.Prepare("delete from tasks where id = $1")
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.ExecContext(ctx, id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
 	return nil
+
 }
 func (db *Postgres) Users(ctx context.Context, id, offset, limit int) ([]*storage.Users, error) {
 
