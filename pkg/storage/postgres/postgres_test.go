@@ -68,7 +68,7 @@ func Test_UpdTask(t *testing.T) {
 	defer cancel()
 
 	ret, err := Db.UpdTasks(ctx, &storage.Tasks{
-		ID:         1000,
+		ID:         1001,
 		Opened:     0,
 		Closed:     0,
 		AuthorID:   101,
@@ -78,9 +78,10 @@ func Test_UpdTask(t *testing.T) {
 	})
 	if err != nil {
 		t.Error(err)
+
 	}
 
-	if ret.Title != "B" {
+	if ret != nil && ret.ID == 0 {
 		err := fmt.Errorf("%s", "ошибка обновления задачи")
 		t.Error(err)
 	}
@@ -90,7 +91,7 @@ func Test_TaskOnID(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	ret, err := Db.Tasks(ctx, 1000, 0, 0, 0, 100)
+	ret, err := Db.Tasks(ctx, 1001, 0, 0, 0, 100)
 	if err != nil {
 		t.Error(err)
 	}

@@ -12,11 +12,11 @@ import (
 func (db *Postgres) Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*storage.Tasks, error) {
 	ret := []*storage.Tasks{}
 	sqlt := `
-			SELECT ID, TITLE, AUTHOR_ID, ASSIGNED_ID, "CONTENT", OPENED, CLOSED 
-			FROM TASKS
-			WHERE ($1 = 0 OR ID = $1) AND
-				  ($2 = 0 OR ASSIGNED_ID = $2) AND
-				  ($3 = 0 OR AUTHOR_ID = $3) 
+			SELECT A.ID, A.TITLE, A.AUTHOR_ID, A.ASSIGNED_ID, A.CONTENT, A.OPENED, A.CLOSED
+			FROM TASKS A
+			WHERE ($1 = 0 OR A.ID = $1) AND
+				  ($2 = 0 OR A.ASSIGNED_ID = $2) AND
+				  ($3 = 0 OR A.AUTHOR_ID = $3) 
 			ORDER BY ID
 			OFFSET $4 LIMIT $5
 		 `
@@ -70,11 +70,11 @@ func (db *Postgres) InsTasks(ctx context.Context, t *storage.Tasks) (*storage.Ta
 func (db *Postgres) TasksOnLabel(ctx context.Context, labelID int, offset, limit int) ([]*storage.Tasks, error) {
 	ret := []*storage.Tasks{}
 	sqlt := `
-			SELECT ID, TITLE, AUTHOR_ID, ASSIGNED_ID, "CONTENT", OPENED, CLOSED 
-			FROM TASKS a
-			JOIN TASKS_LABEL b on b.task_id = a.id  
+			SELECT A.ID, A.TITLE, A.AUTHOR_ID, A.ASSIGNED_ID, A.CONTENT, A.OPENED, A.CLOSED 
+			FROM TASKS A
+			JOIN TASKS_LABELS b on b.task_id = a.id  	
 			WHERE b.id = $1
-			ORDER BY ID
+			ORDER BY A.ID
 			OFFSET $2 LIMIT $3
 		 `
 	rows, err := db.QueryContext(ctx, sqlt, labelID, offset, limit)
@@ -110,7 +110,8 @@ func (db *Postgres) UpdTasks(ctx context.Context, t *storage.Tasks) (*storage.Ta
 				CONTENT = $5,
 				OPENED = 0,
 				CLOSED = 0 
-			 WHERE ID = $1`
+			 WHERE ID = $1 
+			 RETURNING ID`
 
 	stmt, err := tx.Prepare(sqlt)
 	if err != nil {
@@ -119,7 +120,8 @@ func (db *Postgres) UpdTasks(ctx context.Context, t *storage.Tasks) (*storage.Ta
 	}
 	defer stmt.Close()
 
-	_, err = stmt.ExecContext(ctx, t.ID, t.Title, t.AuthorID, t.AssignedID, t.Content)
+	err = stmt.QueryRowContext(ctx, t.ID, t.Title, t.AuthorID, t.AssignedID, t.Content).Scan(&t.ID)
+	// _, err = stmt.ExecContext(ctx, t.ID, t.Title, t.AuthorID, t.AssignedID, t.Content)
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/ta01rus/Skill30_8/pkg/storage"
 
 	"github.com/caarlos0/env/v6"
