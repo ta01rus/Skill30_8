@@ -67,6 +67,35 @@ func (db *Postgres) InsTasks(ctx context.Context, t *storage.Tasks) (*storage.Ta
 	return t, nil
 }
 
+func (db *Postgres) TasksOnLabel(ctx context.Context, labelID int, offset, limit int) ([]*storage.Tasks, error) {
+	ret := []*storage.Tasks{}
+	sqlt := `
+			SELECT ID, TITLE, AUTHOR_ID, ASSIGNED_ID, "CONTENT", OPENED, CLOSED 
+			FROM TASKS a
+			JOIN TASKS_LABEL b on b.task_id = a.id  
+			WHERE b.id = $1
+			ORDER BY ID
+			OFFSET $2 LIMIT $3
+		 `
+	rows, err := db.QueryContext(ctx, sqlt, labelID, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		task := new(storage.Tasks)
+
+		err := rows.Scan(&task.ID, &task.Title, &task.AuthorID,
+			&task.AssignedID, &task.Content, &task.Opened, &task.Closed)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, task)
+	}
+
+	return ret, nil
+}
+
 func (db *Postgres) UpdTasks(ctx context.Context, t *storage.Tasks) (*storage.Tasks, error) {
 	tx, err := db.Begin()
 	if err != nil {

@@ -5,6 +5,8 @@ import "context"
 type DB interface {
 	Tasks(ctx context.Context, id, athID, asgID int, offset, limit int) ([]*Tasks, error)
 
+	TasksOnLabel(ctx context.Context, labelID int, offset, limit int) ([]*Tasks, error)
+
 	InsTasks(context.Context, *Tasks) (*Tasks, error)
 
 	UpdTasks(context.Context, *Tasks) (*Tasks, error)
